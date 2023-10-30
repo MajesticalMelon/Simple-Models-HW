@@ -275,7 +275,7 @@ const getDog = async (req, res) => {
 
   let doc;
   try {
-    doc = await Dog.findOne({ name: req.query.name }).exec();
+    doc = await Dog.findOneAndUpdate({ name: req.query.name }, { $inc: { age: 1 } }, { returnDocument: 'after' }).exec();
   } catch (err) {
     console.log(err);
     return res.status(500).json({ error: 'Something went wrong' });
@@ -283,19 +283,6 @@ const getDog = async (req, res) => {
 
   if (!doc) {
     return res.json({ error: 'No dogs found' });
-  }
-
-  Dog.updateOne({ name: doc.name }, { age: +doc.age + 1 });
-
-  try {
-    doc = await Dog.findOne({ name: req.query.name }).exec();
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json({ error: 'Something went wrong' });
-  }
-
-  if (!doc) {
-    return res.json({ error: 'No updated dogs found' });
   }
 
   return res.json({ name: doc.name, breed: doc.breed, age: doc.age });
